@@ -101,24 +101,30 @@ int main(int argc, char *argv[])
 		  int step_3 = step/3;
 		  data_8bits[i*step_3+j]= (uchar) intensity_val_weighted;
 
+		  // binary = black white 128
+		  int blackwhite = 0;
+		  blackwhite = data[i*step+j*channels+2]*11 + data[i*step+j*channels+1]*16 + data[i*step+j*channels+0]*5;
+		  blackwhite = (uchar) (blackwhite/32);
+
+		  if(blackwhite>=128){blackwhite=255;}
+
+		  data_binary[i*step_3+j] = (uchar) blackwhite;
+
+
+		  //sepia tone
+		  /*outputRed = (inputRed * .393) + (inputGreen *.769) + (inputBlue * .189)
+		    outputGreen = (inputRed * .349) + (inputGreen *.686) + (inputBlue * .168)
+		    outputBlue = (inputRed * .272) + (inputGreen *.534) + (inputBlue * .131)*/
+
+		  data_sepia[i*step+j*channels+2] = .393 * data[i*step+j*channels+2] + .768 * data[i*step+j*channels+1] + .189 * data[i*step+j*channels+0];
+		  data_sepia[i*step+j*channels+1] = .349 * data[i*step+j*channels+2] + .686 * data[i*step+j*channels+1] + .168 * data[i*step+j*channels+0];
+		  data_sepia[i*step+j*channels+0] = .272 * data[i*step+j*channels+2] + .534 * data[i*step+j*channels+1] + .131 * data[i*step+j*channels+0];
+
+		  if(data_sepia[i*step+j*channels+2]>=255){data_sepia[i*step+j*channels+2]=255;}
+		  if(data_sepia[i*step+j*channels+1]>=255){data_sepia[i*step+j*channels+1]=255;}
+		  if(data_sepia[i*step+j*channels+0]>=255){data_sepia[i*step+j*channels+0]=255;}
 	  }
   }
-
-  // binary = black white 128
-
-
-  /* sepia tone
-  outputRed = (inputRed * .393) + (inputGreen *.769) + (inputBlue * .189)
-  outputGreen = (inputRed * .349) + (inputGreen *.686) + (inputBlue * .168)
-  outputBlue = (inputRed * .272) + (inputGreen *.534) + (inputBlue * .131)*/
-
-  data_sepia[i*step+j*channels+2] = .393 * data[i*step+j*channels+2] + .768 * data[i*step+j*channels+1] + .189 * data[i*step+j*channels+0];
-  data_sepia[i*step+j*channels+1] = .349 * data[i*step+j*channels+2] + .686 * data[i*step+j*channels+1] + .168 * data[i*step+j*channels+0];
-  data_sepia[i*step+j*channels+0] = .272 * data[i*step+j*channels+2] + .534 * data[i*step+j*channels+1] + .131 * data[i*step+j*channels+0];
-
-  if(data_sepia[i*step+j*channels+2]>=255){data_sepia[i*step+j*channels+2]=255;}
-  if(data_sepia[i*step+j*channels+1]>=255){data_sepia[i*step+j*channels+1]=255;}
-  if(data_sepia[i*step+j*channels+0]>=255){data_sepia[i*step+j*channels+0]=255;}
 
   // show the image
   cvShowImage("mainWin", img );
