@@ -106,22 +106,22 @@ int main(int argc, char *argv[])
 		  blackwhite = (uchar) (blackwhite/32);
 
 		  if(blackwhite>=128){blackwhite=255;}
+		  if(blackwhite<128){blackwhite=0;}
 
 		  data_binary[i*step_3+j] = (uchar) blackwhite;
-
 
 		  //sepia tone
 		  /*outputRed = (inputRed * .393) + (inputGreen *.769) + (inputBlue * .189)
 		    outputGreen = (inputRed * .349) + (inputGreen *.686) + (inputBlue * .168)
 		    outputBlue = (inputRed * .272) + (inputGreen *.534) + (inputBlue * .131)*/
 
-		  data_sepia[i*step+j*channels+2] = .393 * data[i*step+j*channels+2] + .768 * data[i*step+j*channels+1] + .189 * data[i*step+j*channels+0];
-		  data_sepia[i*step+j*channels+1] = .349 * data[i*step+j*channels+2] + .686 * data[i*step+j*channels+1] + .168 * data[i*step+j*channels+0];
-		  data_sepia[i*step+j*channels+0] = .272 * data[i*step+j*channels+2] + .534 * data[i*step+j*channels+1] + .131 * data[i*step+j*channels+0];
+		  int r = .393 * data[i*step+j*channels+2] + .768 * data[i*step+j*channels+1] + .189 * data[i*step+j*channels+0];
+		  int g = .349 * data[i*step+j*channels+2] + .686 * data[i*step+j*channels+1] + .168 * data[i*step+j*channels+0];
+		  int b = .272 * data[i*step+j*channels+2] + .534 * data[i*step+j*channels+1] + .131 * data[i*step+j*channels+0];
 
-		  if(data_sepia[i*step+j*channels+2]>=255){data_sepia[i*step+j*channels+2]=255;}
-		  if(data_sepia[i*step+j*channels+1]>=255){data_sepia[i*step+j*channels+1]=255;}
-		  if(data_sepia[i*step+j*channels+0]>=255){data_sepia[i*step+j*channels+0]=255;}
+		  if(r>=255){r=255;}	data_sepia[i*step+j*channels+2] = r;
+		  if(g>=255){g=255;}	data_sepia[i*step+j*channels+1] = g;
+		  if(b>=255){b=255;}	data_sepia[i*step+j*channels+0] = b;
 	  }
   }
 
