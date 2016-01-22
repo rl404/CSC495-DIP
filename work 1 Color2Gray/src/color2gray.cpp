@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
 {
   IplImage* img = 0;
   int height,width,step,channels;
-  unsigned char *data, *data_r, *data_g, *data_b, *data_rgb_weighted, *data_rgb_avg, *data_sepia;
+  unsigned char *data, *data_r, *data_g, *data_b,
+  *data_rgb_weighted, *data_rgb_avg, *data_sepia, *data_binary;
   uchar *data_8bits;
   int i,j,k;
 
@@ -39,10 +40,11 @@ int main(int argc, char *argv[])
   cvNamedWindow( "Copy" );
   cvNamedWindow( "Gray scale (weighted)" );
   cvNamedWindow( "Gray scale (average)" );
-  cvNamedWindow( "Use red color channel" );
-  cvNamedWindow( "Use green color channel" );
-  cvNamedWindow( "Use blue color channel" );
+  //cvNamedWindow( "Use red color channel" );
+  //cvNamedWindow( "Use green color channel" );
+  //cvNamedWindow( "Use blue color channel" );
   cvNamedWindow( "8 bit gray scale (one channel)" );
+  cvNamedWindow( "Binary" );
   cvNamedWindow( "Sepia tone" );
 
   // Create an image for the output
@@ -55,6 +57,7 @@ int main(int argc, char *argv[])
   IplImage* out_rgb_avg = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 3 );
   IplImage* out_rgb_weighted = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 3 );
   IplImage* out_8bits = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 1 ); //one channel.
+  IplImage* out_binary = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 1 );
   IplImage* out_sepia = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 3 );
 
   data_rgb_avg = (uchar *) out_rgb_avg->imageData;
@@ -63,6 +66,7 @@ int main(int argc, char *argv[])
   data_g = (uchar *) out_g->imageData;
   data_b = (uchar *) out_b->imageData;
   data_8bits = (uchar *) out_8bits->imageData;
+  data_binary = (uchar *) out_binary->imageData;
   data_sepia = (uchar *) out_sepia->imageData;
 
   int intensity_val_avg = 0;
@@ -100,6 +104,9 @@ int main(int argc, char *argv[])
 	  }
   }
 
+  // binary = black white 128
+
+
   /* sepia tone
   outputRed = (inputRed * .393) + (inputGreen *.769) + (inputBlue * .189)
   outputGreen = (inputRed * .349) + (inputGreen *.686) + (inputBlue * .168)
@@ -109,15 +116,20 @@ int main(int argc, char *argv[])
   data_sepia[i*step+j*channels+1] = .349 * data[i*step+j*channels+2] + .686 * data[i*step+j*channels+1] + .168 * data[i*step+j*channels+0];
   data_sepia[i*step+j*channels+0] = .272 * data[i*step+j*channels+2] + .534 * data[i*step+j*channels+1] + .131 * data[i*step+j*channels+0];
 
+  if(data_sepia[i*step+j*channels+2]>=255){data_sepia[i*step+j*channels+2]=255;}
+  if(data_sepia[i*step+j*channels+1]>=255){data_sepia[i*step+j*channels+1]=255;}
+  if(data_sepia[i*step+j*channels+0]>=255){data_sepia[i*step+j*channels+0]=255;}
+
   // show the image
   cvShowImage("mainWin", img );
   cvShowImage("Copy", copy);
   cvShowImage("Gray scale (average)", out_rgb_avg);
   cvShowImage("Gray scale (weighted)", out_rgb_weighted);
-  cvShowImage("Use red color channel", out_r);
-  cvShowImage("Use green color channel", out_g);
-  cvShowImage("Use blue color channel", out_b);
+  //cvShowImage("Use red color channel", out_r);
+  //cvShowImage("Use green color channel", out_g);
+  //cvShowImage("Use blue color channel", out_b);
   cvShowImage("8 bit gray scale (one channel)", out_8bits);
+  cvShowImage("Binary", out_binary);
   cvShowImage("Sepia", out_sepia);
 
   // wait for a key
@@ -132,6 +144,7 @@ int main(int argc, char *argv[])
   cvReleaseImage(&out_g);
   cvReleaseImage(&out_b);
   cvReleaseImage(&out_8bits);
+  cvReleaseImage(&out_binary);
   cvReleaseImage(&out_sepia);
 
   return 0;
