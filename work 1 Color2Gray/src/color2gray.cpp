@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   cvNamedWindow("mainWin", CV_WINDOW_AUTOSIZE);
   cvMoveWindow("mainWin", 10, 10); //positioned at (x,y).
 
-  cvNamedWindow( "Copy" );
+  //cvNamedWindow( "Copy" );
   cvNamedWindow( "Gray scale (weighted)" );
   cvNamedWindow( "Gray scale (average)" );
   //cvNamedWindow( "Use red color channel" );
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 
   // show the image
   cvShowImage("mainWin", img );
-  cvShowImage("Copy", copy);
+  //cvShowImage("Copy", copy);
   cvShowImage("Gray scale (average)", out_rgb_avg);
   cvShowImage("Gray scale (weighted)", out_rgb_weighted);
   //cvShowImage("Use red color channel", out_r);
@@ -142,12 +142,12 @@ int main(int argc, char *argv[])
 
   // release the image
   cvReleaseImage(&img);
-  cvReleaseImage(&copy);
+  //cvReleaseImage(&copy);
   cvReleaseImage(&out_rgb_avg);
   cvReleaseImage(&out_rgb_weighted);
-  cvReleaseImage(&out_r);
-  cvReleaseImage(&out_g);
-  cvReleaseImage(&out_b);
+  //cvReleaseImage(&out_r);
+  //cvReleaseImage(&out_g);
+  //cvReleaseImage(&out_b);
   cvReleaseImage(&out_8bits);
   cvReleaseImage(&out_binary);
   cvReleaseImage(&out_sepia);
