@@ -1,6 +1,5 @@
 
-//CSC492/495
-//pornchai@sit.kmutt.ac.th
+//Axel 56130500236
 
 #include "opencv2/highgui/highgui.hpp"
 #include <stdio.h>
