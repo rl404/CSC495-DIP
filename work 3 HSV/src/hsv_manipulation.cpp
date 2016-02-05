@@ -28,7 +28,7 @@ void updateHueSaturationValue( int arg, void* )
 	int hue = _hue; // Range from 0 to 179.
 	int saturation = _saturation;
 	int value = _value;
-	int i,j,k,channels;
+	int i,j,k;
 
 	// Transform RGB to HSV
 	IplImage* img_hsv = cvCreateImage(cvGetSize(img), 8, 3);
@@ -49,59 +49,34 @@ void updateHueSaturationValue( int arg, void* )
 	unsigned char *dataV;
 	dataV = (uchar *)Vchannel->imageData;
 
-	int val;
+	int val,val1,val2;
 	uchar red, green, blue;
 	double min, max, delta, r,g,b;
 
 	for(i=0; i< Hchannel->height; i++){
 		for(j=0; j< Hchannel->width; j++){
 
-			red = data[i*width+j+2]/255;
-			green = data[i*width+j+1]/255;
-			blue = data[i*width+j+0]/255;
+			/*red = data[i*step+j*channels+2];
+			green = data[i*step+j*channels+1];
+			blue = data[i*step+j*channels+0];
 
-			/*val = (0.2126 * red)+(0.7152 * green)+(0.0722 * blue);
+			for(k=0;k<channels;k++){
+				val1 += (0.2126 * red)+(0.7152 * green)+(0.0722 * blue);
+			}
 
-			dataV[i*width+j] = val *(255-_value) ;
+			val1 = val1/3;
+			val2 = (0.2126 * red)+(0.7152 * green)+(0.0722 * blue);
+			val = val2;
+
+			if(val>=255){val=255;}
+
+			dataV[i*width+j] = val *_value/255 ;
 
 			b = (blue-val)/1.8556;
 			r = (red-val)/1.5748;
 
-			dataS[i*width+j] = sqrt(pow(b,2) + pow(r,2)) * (255-_saturation);
-			dataH[i*width+j] = atan(r/b) * (179-_hue);
-
-			-------------------------------------------------------
-
-			if(red<green){min=red;}else{min=green;}
-			if(min>blue){min = blue;}
-
-			if(red>green){max=red;}else{max=green;}
-			if(max<blue){max = blue;}
-
-			delta = max - min;
-
-			// VALUE
-			dataV[i*width+j] = max * (255 - _value);
-
-			// SATURATION
-			if(delta == 0){
-				dataS[i*step+j] = 0;
-				dataH[i*step+j] = 0;
-			}else{
-				dataS[i*step+j] = (delta/max);
-
-			// HUE
-				r = (((max-red)/6) + (max/2))/max;
-				g = (((max-green)/6) + (max/2))/max;
-				b = (((max-blue)/6) + (max/2))/max;
-
-				if		(red == max)	{dataH[i*step+j] = b - g ;}
-				else if	(green == max)	{dataH[i*step+j] = (1/3) + r-b;}
-				else if	(blue == max)	{dataH[i*step+j] = (2/3) + g-r;}
-
-				if(dataH[i*step+j] < 0)	{dataH[i*step+j] += 1;}
-				if(dataH[i*step+j] > 1)	{dataH[i*step+j] -= 1;}
-			}*/
+			dataS[i*width+j] = sqrt(pow(b,2) + pow(r,2)) * _saturation/255;
+			dataH[i*width+j] = atan(r/b) * _hue*2/255;*/
 
 		}
 	}
@@ -127,7 +102,7 @@ int main(int argc, char *argv[])
 	setbuf(stdout, NULL);
 
 	// load an image
-	img= cvLoadImage("a.png");
+	img= cvLoadImage("a.jpg");
 	if(!img){
 		printf("Could not load image file: %s\n",argv[1]);
 		exit(0);
