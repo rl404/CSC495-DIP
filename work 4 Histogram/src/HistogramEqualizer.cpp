@@ -35,7 +35,41 @@ IplImage* DrawHistogram(CvHistogram *hist, float scaleX=2, float scaleY=2){
 
 void equalizeHistogram(CvHistogram *hist, IplImage* img){
 
-	// go run it
+	int height    = img->height;
+	int width     = img->width;
+	int step      = img->widthStep;
+
+	int n = height * width;
+
+	float sk,sum = 0.0;
+	uchar val;
+	int f[256] = {0};
+
+	unsigned char *data;
+	data = (uchar *)img->imageData;
+
+	for(int x = 0; x < height; x++){
+		for(int y = 0; y < width; y++){
+			val = data[x*step+y];
+			f[(int)val]++;
+		}
+	}
+
+	for(int x = 0; x < height; x++){
+		for(int y = 0; y < width; y++){
+			val = data[x*step+y];
+
+
+			sum = 0.0;
+			for(int j = 0; j <= val; j++){
+				sum += float(f[j]);
+			}
+
+			sk = 255 * sum /(float)n;
+
+			data[x*step+y] = sk;
+		}
+	}
 
 	return;
 }
@@ -44,8 +78,8 @@ void equalizeHistogram(CvHistogram *hist, IplImage* img){
 
 int main(int argc, char *argv[])
 {
-    //IplImage* img = cvLoadImage("lowContrastPollen.jpg");
-	IplImage* img = cvLoadImage("darkpollen.jpg");
+    IplImage* img = cvLoadImage("lowContrastPollen.jpg");
+	//IplImage* img = cvLoadImage("darkpollen.jpg");
 
     setbuf(stdout, NULL);
     if(!img){
@@ -94,7 +128,7 @@ int main(int argc, char *argv[])
     // Work on the histogram equalization.
   	cvCopy(imgGrayscale, imgHistEqualized);
     equalizeHistogram(hist, imgHistEqualized);
-    cvEqualizeHist(imgGrayscale, imgHistEqualized);
+    //cvEqualizeHist(imgGrayscale, imgHistEqualized);
 
   	// Compute and draw histogram(s) of the equalized-histogram image.
     cvClearHist(hist);
