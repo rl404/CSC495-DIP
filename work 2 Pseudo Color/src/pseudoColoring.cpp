@@ -108,14 +108,14 @@ int main(int argc, char *argv[])
 		for(j=0;j<width;j++){
 			val = dataGrayscale[i*width+j];
 
-			if(val>128){
-				dataRed[i*width+j]=val;
+			if(val<128){
+				dataRed[i*width+j]=0;
+				dataGreen[i*width+j]=2*val;
+				dataBlue[i*width+j]=255-2*val;
+			}else{
+				dataRed[i*width+j]=2*val-255;
 				dataGreen[i*width+j]=510-2*val;
 				dataBlue[i*width+j]=0;
-			}else{
-				dataRed[i*width+j]=0;
-				dataGreen[i*width+j]=val;
-				dataBlue[i*width+j]=255-2*val;
 			}
 		}
 
