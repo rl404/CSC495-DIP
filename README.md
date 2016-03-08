@@ -1,4 +1,4 @@
 # CSC495-DIP
 work
 
-![](nice.gif?raw=true = 100x)
+<img src="nice.gif" height="50">
