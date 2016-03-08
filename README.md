@@ -1,4 +1,4 @@
 # CSC495-DIP
 work
 
-![Alt text](nice.gif?raw=true "Nice")
+![](nice.gif?raw=true =100px)
