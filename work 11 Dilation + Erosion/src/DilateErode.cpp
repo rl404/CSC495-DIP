@@ -23,11 +23,12 @@ int _dilation_no = 0; // Initially, perform no dilation.
 int _erosion_no = 0;
 IplImage* img = 0;
 IplImage* imgBW = 0;
-IplImage* imgOut = 0;
-IplImage* imgOut2 = 0;
+IplImage* imgOutB = 0;
+IplImage* imgOutD = 0;
+IplImage* imgOutE = 0;
 
 
-void doInteration(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut) {
+void doDilation(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut) {
 	int height, width, step;
 
 	// get the image data
@@ -54,10 +55,14 @@ void doInteration(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut)
 	int i, j;
 	int r, c;
 	int sum = 0;
-	bool d[width*height];
-
 
 	// DILATION --------------------------------
+	for (i = 1; i < height-1; i++) {
+		for (j = 1; j < width-1; j++) {
+			dataOut[i * step_3 + j] = data[i * step_3 + j];
+		}
+	}
+
 	for(int cnt = iter_no1; cnt > 0; cnt-- ) {
 		for (i = 1; i < height-1; i++) {
 			for (j = 1; j < width-1; j++) {
@@ -80,8 +85,51 @@ void doInteration(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut)
 		cvCopy(imgOut, BChannel);
 	}
 
+	cvShowImage("Dilation", imgOut); // Needed here.
+
+	// release the images
+	cvReleaseImage(&BChannel);
+	cvReleaseImage(&GChannel);
+	cvReleaseImage(&RChannel);
+
+	return;
+}
+
+void doErosion(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut) {
+	int height, width, step;
+
+	// get the image data
+	height = imgBW->height;
+	width = imgBW->width;
+	step = imgBW->widthStep;
+
+	// Split the 3-channel black&white image into 3 planes.
+	IplImage* BChannel = cvCreateImage(cvGetSize(img), 8, 1); // One channel.
+	IplImage* GChannel = cvCreateImage(cvGetSize(img), 8, 1); // One channel.
+	IplImage* RChannel = cvCreateImage(cvGetSize(img), 8, 1); // One channel.
+
+	cvSplit(imgBW, BChannel, GChannel, RChannel, NULL);
+
+	// Use one of the channel, say, B because the input image is a binary image.
+	unsigned char *data;
+	data = (uchar *) BChannel->imageData;
+
+	unsigned char *dataOut;
+	dataOut = (uchar *) imgOut->imageData;
+	cvSetZero(imgOut); // Clear the output.
+
+	int step_3 = step / 3;
+	int i, j;
+	int sum = 0;
+	bool d[width*height];
 
 	// EROSION ---------------------------------------
+	for (i = 1; i < height-1; i++) {
+		for (j = 1; j < width-1; j++) {
+			dataOut[i * step_3 + j] = data[i * step_3 + j];
+		}
+	}
+
 	for(int cnt = iter_no2; cnt > 0; cnt-- ) {
 		for (i = 1; i < height-1; i++) {
 			for (j = 1; j < width-1; j++) {
@@ -120,7 +168,7 @@ void doInteration(int iter_no1, int iter_no2, IplImage* imgBW, IplImage* imgOut)
 		cvCopy(imgOut, BChannel);
 	}
 
-	cvShowImage("Output", imgOut); // Needed here.
+	cvShowImage("Erosion", imgOut); // Needed here.
 
 	// release the images
 	cvReleaseImage(&BChannel);
@@ -225,7 +273,8 @@ void boundary(IplImage* imgBW, IplImage* imgOut2){
 
 void updateInteration(int arg, void*)
 {
-	doInteration(_dilation_no, _erosion_no, imgBW, imgOut);
+	doDilation(_dilation_no, _erosion_no, imgBW, imgOutD);
+	doErosion(_dilation_no, _erosion_no, imgBW, imgOutE);
 }
 
 int main(int argc, char *argv[]) {
@@ -235,7 +284,7 @@ int main(int argc, char *argv[]) {
 	setbuf(stdout, NULL);
 
 	// load an image
-	img = cvLoadImage("a.png");
+	img = cvLoadImage("d.png");
 	if (!img) {
 		printf("Could not load image file: %s\n", argv[1]);
 		exit(0);
@@ -258,28 +307,32 @@ int main(int argc, char *argv[]) {
 
 
 	// Create an output image (binary image).
-	imgOut = cvCreateImage(cvGetSize(img), 8, 1);
-	imgOut2 = cvCreateImage(cvGetSize(img), 8, 1);
-	cvSetZero(imgOut); // Clear the output (optional).
-	cvSetZero(imgOut2);
+	imgOutD = cvCreateImage(cvGetSize(img), 8, 1);
+	imgOutE = cvCreateImage(cvGetSize(img), 8, 1);
+	imgOutB = cvCreateImage(cvGetSize(img), 8, 1);
+	cvSetZero(imgOutB);
+	cvSetZero(imgOutD);
+	cvSetZero(imgOutE);
 
 	// create a window
 	cvNamedWindow("Original", CV_WINDOW_AUTOSIZE); // Fixed size
 	cvNamedWindow("Binary", CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("Output", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Dilation", CV_WINDOW_AUTOSIZE);
+	cvNamedWindow("Erosion", CV_WINDOW_AUTOSIZE);
 	cvNamedWindow("Boundary", CV_WINDOW_AUTOSIZE);
 
 	// Morphological processing...
-	createTrackbar("Dilation", "Output", &_dilation_no, 10, updateInteration);
-	createTrackbar("Erosion", "Output", &_erosion_no, 10, updateInteration);
+	createTrackbar("Dilation", "Dilation", &_dilation_no, 10, updateInteration);
+	createTrackbar("Erosion", "Erosion", &_erosion_no, 10, updateInteration);
 	updateInteration(0, 0);
 
 	// show the image
 	cvShowImage("Original", img);
 	cvShowImage("Binary", imgBW);
-	cvShowImage("Output", imgOut);
+	cvShowImage("Dilation", imgOutD);
+	cvShowImage("Erosion", imgOutE);
 
-	boundary(imgBW, imgOut2);
+	boundary(imgBW, imgOutB);
 
 	// wait for a key
 	cvWaitKey(0);
@@ -287,8 +340,9 @@ int main(int argc, char *argv[]) {
 	// release the images
 	cvReleaseImage(&img);
 	cvReleaseImage(&imgBW);
-	cvReleaseImage(&imgOut);
-	cvReleaseImage(&imgOut2);
+	cvReleaseImage(&imgOutB);
+	cvReleaseImage(&imgOutD);
+	cvReleaseImage(&imgOutE);
 
 	return 0;
 }
